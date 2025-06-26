@@ -93,7 +93,7 @@ export default function LoginForm() {
             type="submit"
             className="w-full h-12 rounded-full bg-coral text-white hover:bg-coral/90 text-sm font-medium transition-colors"
           >
-            Sign in to Acoem Engage
+            Sign in to Newquiz.online
           </Button>
 
           <div className="text-sm text-center text-navy mt-6">

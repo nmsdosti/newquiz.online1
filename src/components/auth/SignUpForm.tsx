@@ -103,7 +103,7 @@ export default function SignUpForm() {
             type="submit"
             className="w-full h-12 rounded-full bg-coral text-white hover:bg-coral/90 text-sm font-medium transition-colors"
           >
-            Join Acoem Engage
+            Join Newquiz.online
           </Button>
 
           <div className="text-xs text-center text-navy/70 mt-6">

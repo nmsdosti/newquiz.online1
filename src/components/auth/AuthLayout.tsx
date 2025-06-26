@@ -20,10 +20,10 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         <div className="max-w-md w-full px-4 ml-16">
           <div className="text-Left mb-8">
             <h2 className="text-5xl font-bold tracking-tight text-white">
-              Acoem Engage
+              Newquiz.Online
             </h2>
             <p className="text-xl font-medium text-white mt-2">
-              Where Possibility Meets Learning
+              Lets Join the New interative plateform
             </p>
           </div>
           {children}
