@@ -237,7 +237,18 @@ const CreateQuiz = () => {
   };
 
   const saveQuiz = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to save your quiz",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!validateQuiz()) return;
+
+    setLoading(true);
 
     try {
       let quizIdToUse;
@@ -302,7 +313,9 @@ const CreateQuiz = () => {
       }
 
       // Insert all questions
-      for (const question of questions) {
+      for (let i = 0; i < questions.length; i++) {
+        const question = questions[i];
+
         const { data: questionData, error: questionError } = await supabase
           .from("questions")
           .insert({
@@ -318,24 +331,26 @@ const CreateQuiz = () => {
         }
 
         if (!questionData || questionData.length === 0) {
-          throw new Error("Failed to create question");
+          throw new Error(`Failed to create question ${i + 1}`);
         }
 
         const questionId = questionData[0].id;
         console.log("Created question with ID:", questionId);
 
         // Insert all options for this question
-        for (const option of question.options) {
-          const { error: optionError } = await supabase.from("options").insert({
-            question_id: questionId,
-            text: option.text,
-            is_correct: option.isCorrect,
-          });
+        const optionsToInsert = question.options.map((option) => ({
+          question_id: questionId,
+          text: option.text,
+          is_correct: option.isCorrect,
+        }));
 
-          if (optionError) {
-            console.error("Option insert error:", optionError);
-            throw optionError;
-          }
+        const { error: optionError } = await supabase
+          .from("options")
+          .insert(optionsToInsert);
+
+        if (optionError) {
+          console.error("Option insert error:", optionError);
+          throw optionError;
         }
       }
 
@@ -346,14 +361,19 @@ const CreateQuiz = () => {
           : "Your quiz has been saved successfully",
       });
 
-      navigate("/host");
+      // Small delay to show the success message before navigating
+      setTimeout(() => {
+        navigate("/host");
+      }, 1000);
     } catch (error: any) {
       console.error("Error saving quiz:", error);
       toast({
         title: "Error saving quiz",
-        description: error.message || "Something went wrong",
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -372,11 +392,7 @@ const CreateQuiz = () => {
       <div className="max-w-4xl mx-auto px-4">
         <div className="w-full bg-white flex justify-between items-center px-6 py-4 shadow-md fixed top-0 left-0 right-0 z-50">
           <Link to="/">
-            <img
-              src="https://fixturlaser.com/wp-content/uploads/2021/05/ACOEM-LOGO-WithoutBaseline-CMYK-Bicolor.png"
-              alt="ACOEM Logo"
-              className="h-12 w-auto ml-16 hover:cursor-pointer"
-            />
+            <Logo className="h-12 w-auto ml-16" />
           </Link>
           <UserMenu />
         </div>
@@ -394,10 +410,11 @@ const CreateQuiz = () => {
             </Button>
             <Button
               onClick={saveQuiz}
+              disabled={loading}
               className="bg-navy hover:bg-navy/90 gap-2"
             >
               <Save className="h-4 w-4" />
-              Save Quiz
+              {loading ? "Saving..." : "Save Quiz"}
             </Button>
           </div>
         </div>
@@ -551,9 +568,10 @@ const CreateQuiz = () => {
           <CardFooter className="flex justify-end pt-6">
             <Button
               onClick={saveQuiz}
+              disabled={loading}
               className="bg-navy hover:bg-navy/90 gap-2 text-lg px-8 py-6 h-auto"
             >
-              Save Quiz
+              {loading ? "Saving..." : "Save Quiz"}
               <ArrowRight className="h-5 w-5" />
             </Button>
           </CardFooter>

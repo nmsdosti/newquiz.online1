@@ -8,6 +8,7 @@ import { useAuth } from "@/components/auth/VercelAuthProvider";
 import { Navigate } from "react-router-dom";
 import { Link, useNavigate } from "react-router-dom";
 import UserMenu from "@/components/ui/user-menu";
+import Logo from "@/components/ui/logo";
 
 interface PendingUser {
   id: string;
@@ -98,11 +99,7 @@ export default function AdminApproval() {
     <div className="min-h-screen bg-[#FF6952] to-teal-500 p-4">
       <div className="w-full bg-white flex justify-between items-center px-6 py-4 shadow-md fixed top-0 left-0 right-0 z-50">
         <Link to="/">
-          <img
-            src="https://fixturlaser.com/wp-content/uploads/2021/05/ACOEM-LOGO-WithoutBaseline-CMYK-Bicolor.png"
-            alt="ACOEM Logo"
-            className="h-12 w-auto ml-16"
-          />
+          <Logo className="h-12 w-auto ml-16" />
         </Link>
         <UserMenu />
       </div>

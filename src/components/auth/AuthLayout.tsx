@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Link } from "react-router-dom";
+import Logo from "@/components/ui/logo";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
@@ -9,11 +10,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         <div className="max-w-[980px] mx-16 flex h-20 items-center justify-left px-4">
           <div>
             <Link to="/">
-              <img
-                src="https://fixturlaser.com/wp-content/uploads/2021/05/ACOEM-LOGO-WithoutBaseline-CMYK-Bicolor.png"
-                alt="ACOEM Logo"
-                className="h-12 w-auto ml-0"
-              />
+              <Logo className="h-12 w-auto ml-16" />
             </Link>
           </div>
         </div>

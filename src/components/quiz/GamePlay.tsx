@@ -1143,11 +1143,7 @@ const GamePlay = () => {
     <div className="min-h-screen bg-[#FF6952] pt-16 pb-12">
       <div className="w-full bg-white flex justify-between items-center px-6 py-4 shadow-md fixed top-0 left-0 right-0 z-50">
         <Link to="/">
-          <img
-            src="https://fixturlaser.com/wp-content/uploads/2021/05/ACOEM-LOGO-WithoutBaseline-CMYK-Bicolor.png"
-            alt="ACOEM Logo"
-            className="h-12 w-auto ml-16 hover:cursor-pointer"
-          />
+          <Logo className="h-12 w-auto ml-16" />
         </Link>
         <UserMenu />
       </div>
@@ -1532,11 +1528,7 @@ const GameSummary: React.FC<GameSummaryProps> = ({
     <div className="min-h-screen bg-[#f5f5f7] pt-16 pb-12">
       <div className="w-full bg-white flex justify-between items-center px-6 py-4 shadow-md fixed top-0 left-0 right-0 z-50">
         <Link to="/">
-          <img
-            src="https://fixturlaser.com/wp-content/uploads/2021/05/ACOEM-LOGO-WithoutBaseline-CMYK-Bicolor.png"
-            alt="ACOEM Logo"
-            className="h-12 w-auto ml-16 hover:cursor-pointer"
-          />
+          <Logo className="h-12 w-auto ml-16" />
         </Link>
         <UserMenu />
       </div>

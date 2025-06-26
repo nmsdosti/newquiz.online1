@@ -9,8 +9,8 @@ const Logo = ({ className = "" }: LogoProps) => {
   return (
     <Link to="/" className={`block ${className}`}>
       <img
-        src="https://fixturlaser.com/wp-content/uploads/2021/05/ACOEM-LOGO-WithoutBaseline-CMYK-Bicolor.png"
-        alt="ACOEM Logo"
+        src="https://i.postimg.cc/pXxdtDJz/quiz-online-logo.png"
+        alt="Newquiz.online Logo"
         className="h-10 w-auto"
       />
     </Link>

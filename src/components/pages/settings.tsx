@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserMenu from "../ui/user-menu";
 import { Link } from "react-router-dom";
+import Logo from "@/components/ui/logo";
 
 const Settings = () => {
   const { user } = useAuth();
@@ -30,11 +31,7 @@ const Settings = () => {
       {/* Header */}
       <div className="w-full bg-white flex justify-between items-center px-6 py-4 shadow-md fixed top-0 left-0 right-0 z-50">
         <Link to="/">
-          <img
-            src="https://fixturlaser.com/wp-content/uploads/2021/05/ACOEM-LOGO-WithoutBaseline-CMYK-Bicolor.png"
-            alt="ACOEM Logo"
-            className="h-12 w-auto ml-16 hover:cursor-pointer"
-          />
+          <Logo className="h-12 w-auto ml-16" />
         </Link>
         <UserMenu />
       </div>
