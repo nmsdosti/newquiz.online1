@@ -1,0 +1,7 @@
+id,avatar_url,user_id,token_identifier,image,created_at,updated_at,email,name,full_name,is_approved,is_admin
+0b21ee3e-9bb8-4ad2-9a1c-0be09bd2a9c9,,0b21ee3e-9bb8-4ad2-9a1c-0be09bd2a9c9,0b21ee3e-9bb8-4ad2-9a1c-0be09bd2a9c9,,2025-05-29 11:20:24.462524+00,2025-06-24 10:35:52.294642+00,prashant.pawar@acoem.com,,Prashant,true,false
+65906a29-57e7-4195-b14d-0925a17049b4,,65906a29-57e7-4195-b14d-0925a17049b4,abc@abc.abc,,2025-05-16 12:00:39.900929+00,2025-06-24 11:31:09.472082+00,abc@abc.abc,,Nimesh Patel,true,true
+7b1f078a-d2d1-40db-b4fb-a735e00292fc,,7b1f078a-d2d1-40db-b4fb-a735e00292fc,7b1f078a-d2d1-40db-b4fb-a735e00292fc,,2025-05-21 05:59:15.221601+00,2025-05-29 10:56:18.018799+00,supriya.rakshit@acoem.com,,Supriya Rakshit,true,false
+8df127b7-101c-42e4-b1c6-6c416ce6618d,,,8df127b7-101c-42e4-b1c6-6c416ce6618d,,2025-06-11 07:37:14.779977+00,,nimeshpatel210@gmail.com,,Nimesh,true,false
+af6c2302-0231-4e49-8dfa-52865d62a5c6,,af6c2302-0231-4e49-8dfa-52865d62a5c6,af6c2302-0231-4e49-8dfa-52865d62a5c6,,2025-06-11 07:02:08.759133+00,2025-06-11 07:04:40.30714+00,nmspatel.210@gmail.com,,Nimesh Patel,true,false
+ef210363-f1de-435f-bab1-fe12b533db56,,,ef210363-f1de-435f-bab1-fe12b533db56,,2025-05-30 12:08:23.863224+00,,prashant.pawar@acoem.com,,Prashant,true,false
