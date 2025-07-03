@@ -3,10 +3,10 @@ import { createClient } from "@supabase/supabase-js";
 // Use environment variables with fallback to hardcoded values
 const supabaseUrl =
   import.meta.env.VITE_SUPABASE_URL ||
-  "https://gpjmttgqolnblfiiikra.supabase.co";
+  "https://xxlwvrjhaqqzpcbtepex.supabase.co";
 const supabaseAnonKey =
   import.meta.env.VITE_SUPABASE_ANON_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZuaXhzd3R4dnVxdHl0bmVxZ29zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE3MjUyNDMsImV4cCI6MjA1NzMwMTI0M30.-qsxItJdRegH2_wQogU7sntv_tXhi1S1tjK6fkmYHyk";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4bHd2cmpoYXFxenBjYnRlcGV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MjU5OTEsImV4cCI6MjA2NjQwMTk5MX0.raavEBd4IGWyvwiGRi_2PsArGQ_C2C1p4RJC3rYKsaE";
 
 console.log(
   "Initializing Supabase client with URL:",

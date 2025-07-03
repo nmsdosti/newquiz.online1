@@ -80,12 +80,12 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
 
 function AppRoutes() {
   // For the tempo routes
-  if (import.meta.env.VITE_TEMPO === "true") {
-    useRoutes(routes);
-  }
+  const tempoRoutes =
+    import.meta.env.VITE_TEMPO === "true" ? useRoutes(routes) : null;
 
   return (
     <>
+      {tempoRoutes}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginForm />} />

@@ -39,8 +39,6 @@ const HostQuiz = () => {
   const fetchQuizzes = async () => {
     try {
       setLoading(true);
-
-      // Get all quizzes created by the user
       const { data: quizzesData, error: quizzesError } = await supabase
         .from("quizzes")
         .select("*")
@@ -49,13 +47,17 @@ const HostQuiz = () => {
 
       if (quizzesError) throw quizzesError;
 
-      // For each quiz, count the number of questions
       const quizzesWithQuestionCount = await Promise.all(
         (quizzesData || []).map(async (quiz) => {
+          console.log("Original quiz.id from DB:", quiz.id); // <--- ADD THIS
+          console.log("Length of original quiz.id:", quiz.id.length); // <--- ADD THIS
+          // Try to force convert to string just in case, though it should be string
+          console.log("quiz.id as string:", String(quiz.id)); // <--- ADD THIS
+
           const { count, error } = await supabase
             .from("questions")
             .select("*", { count: "exact" })
-            .eq("quiz_id", quiz.id);
+            .eq("quiz_id", quiz.id); // Use the original for DB query for now
 
           return {
             ...quiz,
@@ -63,7 +65,6 @@ const HostQuiz = () => {
           };
         }),
       );
-
       setQuizzes(quizzesWithQuestionCount);
     } catch (error: any) {
       toast({
@@ -462,7 +463,8 @@ const HostQuiz = () => {
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/edit/${quiz.id}`);
+                          // Ensure quiz.id is trimmed before navigation
+                          navigate(`/edit/${quiz.id.trim()}`);
                         }}
                         variant="outline"
                         size="sm"

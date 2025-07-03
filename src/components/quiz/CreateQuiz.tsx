@@ -138,48 +138,11 @@ const CreateQuiz = () => {
       return false;
     }
 
-    for (let i = 0; i < questions.length; i++) {
-      const question = questions[i];
-      const questionNumber = i + 1;
-
+    for (const question of questions) {
       if (!question.text.trim()) {
         toast({
           title: "Incomplete question",
-          description: `Question ${questionNumber} is missing text`,
-          variant: "destructive",
-        });
-        return false;
-      }
-
-      // Check for extremely long text that might cause database issues
-      if (question.text.length > 10000) {
-        toast({
-          title: "Question text too long",
-          description: `Question ${questionNumber} text is too long (${question.text.length} characters, max 10000)`,
-          variant: "destructive",
-        });
-        return false;
-      }
-
-      // Enhanced character validation
-      const hasProblematicChars = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/.test(
-        question.text,
-      );
-      if (hasProblematicChars) {
-        toast({
-          title: "Invalid characters",
-          description: `Question ${questionNumber} contains invalid control characters`,
-          variant: "destructive",
-        });
-        return false;
-      }
-
-      // Check for other potentially problematic characters
-      const hasUnicodeIssues = /[\uFFFD\uFEFF]/.test(question.text);
-      if (hasUnicodeIssues) {
-        toast({
-          title: "Invalid Unicode characters",
-          description: `Question ${questionNumber} contains invalid Unicode characters`,
+          description: `Question ${question.id} is missing text`,
           variant: "destructive",
         });
         return false;
@@ -188,7 +151,7 @@ const CreateQuiz = () => {
       if (question.timeLimit < 5 || question.timeLimit > 120) {
         toast({
           title: "Invalid time limit",
-          description: `Time limit for question ${questionNumber} must be between 5 and 120 seconds`,
+          description: `Time limit for question ${question.id} must be between 5 and 120 seconds`,
           variant: "destructive",
         });
         return false;
@@ -198,42 +161,17 @@ const CreateQuiz = () => {
       if (!hasCorrectOption) {
         toast({
           title: "Missing correct answer",
-          description: `Question ${questionNumber} doesn't have a correct answer selected`,
+          description: `Question ${question.id} doesn't have a correct answer selected`,
           variant: "destructive",
         });
         return false;
       }
 
-      for (let j = 0; j < question.options.length; j++) {
-        const option = question.options[j];
-
+      for (const option of question.options) {
         if (!option.text.trim()) {
           toast({
             title: "Incomplete option",
-            description: `An option in question ${questionNumber} is empty`,
-            variant: "destructive",
-          });
-          return false;
-        }
-
-        // Check option text length
-        if (option.text.length > 5000) {
-          toast({
-            title: "Option text too long",
-            description: `Option ${j + 1} in question ${questionNumber} is too long (${option.text.length} characters, max 5000)`,
-            variant: "destructive",
-          });
-          return false;
-        }
-
-        // Check for problematic characters in options
-        const hasProblematicChars = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/.test(
-          option.text,
-        );
-        if (hasProblematicChars) {
-          toast({
-            title: "Invalid characters",
-            description: `Option ${j + 1} in question ${questionNumber} contains invalid characters`,
+            description: `An option in question ${question.id} is empty`,
             variant: "destructive",
           });
           return false;
@@ -328,13 +266,14 @@ const CreateQuiz = () => {
         const { error: quizError } = await supabase
           .from("quizzes")
           .update({
-            title: quizTitle.trim(),
-            description: quizDescription.trim(),
+            title: quizTitle,
+            description: quizDescription,
             updated_at: new Date().toISOString(),
           })
           .eq("id", quizId);
 
         if (quizError) {
+          console.error("Quiz update error:", quizError);
           throw quizError;
         }
 
@@ -346,9 +285,7 @@ const CreateQuiz = () => {
           .select("id")
           .eq("quiz_id", quizId);
 
-        if (fetchError) {
-          throw fetchError;
-        }
+        if (fetchError) throw fetchError;
 
         // Delete all existing questions (cascade will delete options)
         if (existingQuestions && existingQuestions.length > 0) {
@@ -357,9 +294,7 @@ const CreateQuiz = () => {
             .delete()
             .eq("quiz_id", quizId);
 
-          if (deleteError) {
-            throw deleteError;
-          }
+          if (deleteError) throw deleteError;
         }
       } else {
         // Check if user is authenticated
@@ -368,18 +303,17 @@ const CreateQuiz = () => {
         }
 
         // Insert new quiz
-        const quizInsertData = {
-          title: quizTitle.trim(),
-          description: quizDescription.trim(),
-          user_id: user.id,
-        };
-
         const { data: quizData, error: quizError } = await supabase
           .from("quizzes")
-          .insert(quizInsertData)
+          .insert({
+            title: quizTitle,
+            description: quizDescription,
+            user_id: user.id,
+          })
           .select();
 
         if (quizError) {
+          console.error("Quiz insert error:", quizError);
           throw quizError;
         }
 
@@ -388,95 +322,46 @@ const CreateQuiz = () => {
         }
 
         quizIdToUse = quizData[0].id;
+        console.log("Created quiz with ID:", quizIdToUse);
       }
 
       // Insert all questions
-      for (let i = 0; i < questions.length; i++) {
-        const question = questions[i];
-
-        // Clean and validate question text
-        const cleanQuestionText = question.text.trim();
-
-        if (!cleanQuestionText) {
-          throw new Error(`Question ${i + 1} text is empty after trimming`);
-        }
-
-        if (cleanQuestionText.length > 10000) {
-          throw new Error(
-            `Question ${i + 1} text is too long (${cleanQuestionText.length} characters, max 10000)`,
-          );
-        }
-
-        // Additional text cleaning - remove any potential problematic characters
-        const sanitizedText = cleanQuestionText
-          .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "") // Remove control characters
-          .replace(/[\uFFFD\uFEFF]/g, "") // Remove Unicode replacement/BOM characters
-          .normalize("NFC"); // Normalize Unicode
-
-        const questionInsertData = {
-          quiz_id: quizIdToUse,
-          text: sanitizedText,
-          time_limit: question.timeLimit,
-        };
-
+      for (const question of questions) {
         const { data: questionData, error: questionError } = await supabase
           .from("questions")
-          .insert(questionInsertData)
+          .insert({
+            quiz_id: quizIdToUse,
+            text: question.text,
+            time_limit: question.timeLimit,
+          })
           .select();
 
         if (questionError) {
-          throw new Error(
-            `Failed to insert question ${i + 1}: ${questionError.message}`,
-          );
+          console.error("Question insert error:", questionError);
+          throw questionError;
         }
 
         if (!questionData || questionData.length === 0) {
-          throw new Error(
-            `Failed to create question ${i + 1} - no data returned`,
-          );
+          throw new Error("Failed to create question");
         }
 
         const questionId = questionData[0].id;
+        console.log("Created question with ID:", questionId);
 
         // Insert all options for this question
-        for (let j = 0; j < question.options.length; j++) {
-          const option = question.options[j];
-
-          // Clean and validate option text
-          const cleanOptionText = option.text.trim();
-          if (!cleanOptionText) {
-            throw new Error(
-              `Question ${i + 1}, Option ${j + 1} text is empty after trimming`,
-            );
-          }
-
-          if (cleanOptionText.length > 5000) {
-            throw new Error(
-              `Question ${i + 1}, Option ${j + 1} text is too long (${cleanOptionText.length} characters, max 5000)`,
-            );
-          }
-
-          // Sanitize option text
-          const sanitizedOptionText = cleanOptionText
-            .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
-            .replace(/[\uFFFD\uFEFF]/g, "")
-            .normalize("NFC");
-
-          const optionInsertData = {
+        const optionPromises = question.options.map((option) => {
+          return supabase.from("options").insert({
             question_id: questionId,
-            text: sanitizedOptionText,
+            text: option.text,
             is_correct: option.isCorrect,
-          };
+          });
+        });
 
-          const { error: optionError } = await supabase
-            .from("options")
-            .insert(optionInsertData);
-
-          if (optionError) {
-            throw new Error(
-              `Failed to insert option ${j + 1} for question ${i + 1}: ${optionError.message}`,
-            );
-          }
+        const optionResults = await Promise.all(optionPromises);
+        const optionError = optionResults.find((result) => result.error);
+        if (optionError) {
+          console.error("Option insert error:", optionError);
+          throw optionError.error;
         }
       }
 
@@ -515,7 +400,11 @@ const CreateQuiz = () => {
       <div className="max-w-4xl mx-auto px-4">
         <div className="w-full bg-white flex justify-between items-center px-6 py-4 shadow-md fixed top-0 left-0 right-0 z-50">
           <Link to="/">
-            <Logo className="h-12 w-auto ml-16" />
+            <img
+              src="https://i.postimg.cc/HxN6vH35/Content-that.png"
+              alt="ACOEM Logo"
+              className="h-12 w-auto ml-16 hover:cursor-pointer"
+            />
           </Link>
           <UserMenu />
         </div>
