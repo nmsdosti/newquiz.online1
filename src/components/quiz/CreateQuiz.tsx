@@ -325,6 +325,7 @@ const CreateQuiz = () => {
 
         quizIdToUse = quizData[0].id;
         console.log("Created quiz with ID:", quizIdToUse);
+      }
 
       // Insert all questions
       for (const question of questions) {
@@ -490,14 +491,13 @@ const CreateQuiz = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Question Text
                   </label>
-                  <Textarea
+                  <Input
                     value={question.text}
                     onChange={(e) =>
                       updateQuestion(question.id, "text", e.target.value)
                     }
                     placeholder="Enter your question"
-                    className="w-full min-h-[80px] resize-y"
-                    rows={3}
+                    className="w-full min-h-[60px]"
                   />
                 </div>
                 <div>
@@ -545,7 +545,7 @@ const CreateQuiz = () => {
                             }
                             className="h-4 w-4"
                           />
-                          <Textarea
+                          <Input
                             value={option.text}
                             onChange={(e) =>
                               updateOption(
@@ -556,8 +556,7 @@ const CreateQuiz = () => {
                               )
                             }
                             placeholder={`Option ${index + 1}`}
-                            className="flex-1 bg-white/20 border-none text-white placeholder:text-white/60 focus:ring-white/50 min-h-[50px] resize-none"
-                            rows={2}
+                            className="flex-1 bg-white/20 border-none text-white placeholder:text-white/60 focus:ring-white/50 min-h-[40px]"
                           />
                         </div>
                       );
