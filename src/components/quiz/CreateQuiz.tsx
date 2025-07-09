@@ -138,11 +138,13 @@ const CreateQuiz = () => {
       return false;
     }
 
-    for (const question of questions) {
+    for (let i = 0; i < questions.length; i++) {
+      const question = questions[i];
+      
       if (!question.text.trim()) {
         toast({
           title: "Incomplete question",
-          description: `Question ${question.id} is missing text`,
+          description: `Question ${i + 1} is missing text`,
           variant: "destructive",
         });
         return false;
@@ -151,7 +153,7 @@ const CreateQuiz = () => {
       if (question.timeLimit < 5 || question.timeLimit > 120) {
         toast({
           title: "Invalid time limit",
-          description: `Time limit for question ${question.id} must be between 5 and 120 seconds`,
+          description: `Time limit for question ${i + 1} must be between 5 and 120 seconds`,
           variant: "destructive",
         });
         return false;
@@ -161,17 +163,18 @@ const CreateQuiz = () => {
       if (!hasCorrectOption) {
         toast({
           title: "Missing correct answer",
-          description: `Question ${question.id} doesn't have a correct answer selected`,
+          description: `Question ${i + 1} doesn't have a correct answer selected`,
           variant: "destructive",
         });
         return false;
       }
 
-      for (const option of question.options) {
+      for (let j = 0; j < question.options.length; j++) {
+        const option = question.options[j];
         if (!option.text.trim()) {
           toast({
             title: "Incomplete option",
-            description: `An option in question ${question.id} is empty`,
+            description: `Option ${j + 1} in question ${i + 1} is empty`,
             variant: "destructive",
           });
           return false;
@@ -260,115 +263,92 @@ const CreateQuiz = () => {
     try {
       setLoading(true);
       
-      setLoading(true);
-      let quizIdToUse;
-
-      if (isEditing && quizId) {
-        // Update existing quiz
-        const { error: quizError } = await supabase
-          .from("quizzes")
-          .update({
-            title: quizTitle,
-            description: quizDescription,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", quizId);
-
-        if (quizError) {
-          console.error("Quiz update error:", quizError);
-          throw quizError;
-        }
-
-        quizIdToUse = quizId;
-
-        // Delete existing questions and options to replace with new ones
-        const { data: existingQuestions, error: fetchError } = await supabase
-          .from("questions")
-          .select("id")
-          .eq("quiz_id", quizId);
-
-        if (fetchError) throw fetchError;
-
-        // Delete all existing questions (cascade will delete options)
-        if (existingQuestions && existingQuestions.length > 0) {
-          const { error: deleteError } = await supabase
-            .from("questions")
-            .delete()
-            .eq("quiz_id", quizId);
-
-          if (deleteError) throw deleteError;
-        }
-      } else {
-        // Check if user is authenticated
-        if (!user || !user.id) {
-          throw new Error("You must be logged in to create a quiz");
-        }
-
-        // Insert new quiz
-        const { data: quizData, error: quizError } = await supabase
-          .from("quizzes")
-          .insert({
-            title: quizTitle,
-            description: quizDescription,
-            user_id: user.id,
-          })
-          .select();
-
-        if (quizError) {
-          console.error("Quiz insert error:", quizError);
-          throw quizError;
-        }
-
-        if (!quizData || quizData.length === 0) {
-          throw new Error("Failed to create quiz");
-        }
-
-        quizIdToUse = quizData[0].id;
-        console.log("Created quiz with ID:", quizIdToUse);
+      // Check if user is authenticated
+      if (!user || !user.id) {
+        throw new Error("You must be logged in to create a quiz");
       }
 
+      console.log("Starting quiz creation...");
+      console.log("Quiz title:", quizTitle);
+      console.log("Number of questions:", questions.length);
+      
+      // Insert new quiz
+      const { data: quizData, error: quizError } = await supabase
+        .from("quizzes")
+        .insert({
+          title: quizTitle.trim(),
+          description: quizDescription.trim() || null,
+          user_id: user.id,
+        })
+        .select();
+
+      if (quizError) {
+        console.error("Quiz insert error:", quizError);
+        throw new Error(`Failed to create quiz: ${quizError.message}`);
+      }
+
+      if (!quizData || quizData.length === 0) {
+        throw new Error("No quiz data returned from database");
+      }
+
+      const quizId = quizData[0].id;
+      console.log("Created quiz with ID:", quizId);
+
       // Insert all questions
-      for (const question of questions) {
+      for (let i = 0; i < questions.length; i++) {
+        const question = questions[i];
+        console.log(`Processing question ${i + 1}:`, question.text.substring(0, 50) + "...");
+        
         const { data: questionData, error: questionError } = await supabase
           .from("questions")
           .insert({
-            quiz_id: quizIdToUse,
-            text: question.text,
+            quiz_id: quizId,
+            text: question.text.trim(),
             time_limit: question.timeLimit,
+            order_index: i,
           })
           .select();
 
         if (questionError) {
           console.error("Question insert error:", questionError);
-          throw questionError;
+          throw new Error(`Failed to create question ${i + 1}: ${questionError.message}`);
         }
 
         if (!questionData || questionData.length === 0) {
-          throw new Error("Failed to create question");
+          throw new Error(`No question data returned for question ${i + 1}`);
         }
 
         const questionId = questionData[0].id;
-        console.log("Created question with ID:", questionId);
+        console.log(`Created question ${i + 1} with ID:`, questionId);
 
         // Insert all options for this question
-        const optionPromises = question.options.map((option) => {
-          return supabase.from("options").insert({
+        for (let j = 0; j < question.options.length; j++) {
+          const option = question.options[j];
+          
+          if (!option.text.trim()) {
+            throw new Error(`Option ${j + 1} in question ${i + 1} is empty`);
+          }
+          
+          const { error: optionError } = await supabase.from("options").insert({
             question_id: questionId,
-            text: option.text,
+            text: option.text.trim(),
             is_correct: option.isCorrect,
+            order_index: j,
           });
-        });
 
-        const optionResults = await Promise.all(optionPromises);
-        const optionError = optionResults.find((result) => result.error);
-        if (optionError) {
-          console.error("Option insert error:", optionError);
-          throw optionError.error;
+          if (optionError) {
+            console.error(`Option ${j + 1} insert error:`, optionError);
+            throw new Error(`Failed to create option ${j + 1} for question ${i + 1}: ${optionError.message}`);
+          }
         }
+        
+        console.log(`Successfully created all options for question ${i + 1}`);
       }
 
+      console.log("Quiz creation completed successfully!");
+      
       toast({
-        title: "Quiz created!",
+        title: "Quiz Created Successfully!",
         description: "Your quiz has been saved successfully",
       });
 
@@ -491,13 +471,14 @@ const CreateQuiz = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Question Text
                   </label>
-                  <Input
+                  <Textarea
                     value={question.text}
                     onChange={(e) =>
                       updateQuestion(question.id, "text", e.target.value)
                     }
                     placeholder="Enter your question"
-                    className="w-full min-h-[60px]"
+                    className="w-full min-h-[80px] resize-y"
+                    rows={3}
                   />
                 </div>
                 <div>
