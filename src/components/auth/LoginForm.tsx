@@ -40,7 +40,7 @@ export default function LoginForm() {
           "Your account is pending approval. Please wait for admin approval.",
         );
       } else {
-        setError(error.message || "Invalid email or password");
+        setError("Invalid email or password");
       }
     }
   };
