@@ -259,6 +259,8 @@ const CreateQuiz = () => {
 
     try {
       setLoading(true);
+      
+      setLoading(true);
       let quizIdToUse;
 
       if (isEditing && quizId) {
@@ -323,7 +325,6 @@ const CreateQuiz = () => {
 
         quizIdToUse = quizData[0].id;
         console.log("Created quiz with ID:", quizIdToUse);
-      }
 
       // Insert all questions
       for (const question of questions) {
@@ -366,10 +367,8 @@ const CreateQuiz = () => {
       }
 
       toast({
-        title: isEditing ? "Quiz updated!" : "Quiz created!",
-        description: isEditing
-          ? "Your quiz has been updated successfully"
-          : "Your quiz has been saved successfully",
+        title: "Quiz created!",
+        description: "Your quiz has been saved successfully",
       });
 
       navigate("/host");
@@ -491,13 +490,14 @@ const CreateQuiz = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Question Text
                   </label>
-                  <Input
+                  <Textarea
                     value={question.text}
                     onChange={(e) =>
                       updateQuestion(question.id, "text", e.target.value)
                     }
                     placeholder="Enter your question"
-                    className="w-full"
+                    className="w-full min-h-[80px] resize-y"
+                    rows={3}
                   />
                 </div>
                 <div>
@@ -545,7 +545,7 @@ const CreateQuiz = () => {
                             }
                             className="h-4 w-4"
                           />
-                          <Input
+                          <Textarea
                             value={option.text}
                             onChange={(e) =>
                               updateOption(
@@ -556,7 +556,8 @@ const CreateQuiz = () => {
                               )
                             }
                             placeholder={`Option ${index + 1}`}
-                            className="flex-1 bg-white/20 border-none text-white placeholder:text-white/60 focus:ring-white/50"
+                            className="flex-1 bg-white/20 border-none text-white placeholder:text-white/60 focus:ring-white/50 min-h-[50px] resize-none"
+                            rows={2}
                           />
                         </div>
                       );
